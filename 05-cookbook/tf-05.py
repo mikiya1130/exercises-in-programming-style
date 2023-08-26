@@ -1,10 +1,12 @@
 #!/usr/bin/env python
-import sys, string
+import string
+import sys
 
 # The shared mutable data
 data = []
 words = []
 word_freqs = []
+
 
 #
 # The procedures
@@ -18,6 +20,7 @@ def read_file(path_to_file):
     with open(path_to_file) as f:
         data = data + list(f.read())
 
+
 def filter_chars_and_normalize():
     """
     Replaces all nonalphanumeric chars in data with white space
@@ -25,9 +28,10 @@ def filter_chars_and_normalize():
     global data
     for i in range(len(data)):
         if not data[i].isalnum():
-            data[i] = ' '
+            data[i] = " "
         else:
             data[i] = data[i].lower()
+
 
 def scan():
     """
@@ -35,13 +39,14 @@ def scan():
     """
     global data
     global words
-    data_str = ''.join(data)
+    data_str = "".join(data)
     words = words + data_str.split()
+
 
 def remove_stop_words():
     global words
-    with open('../stop_words.txt') as f:
-        stop_words = f.read().split(',')
+    with open("../stop_words.txt") as f:
+        stop_words = f.read().split(",")
     # add single-letter words
     stop_words.extend(list(string.ascii_lowercase))
     indexes = []
@@ -50,6 +55,7 @@ def remove_stop_words():
             indexes.append(i)
     for i in reversed(indexes):
         words.pop(i)
+
 
 def frequencies():
     """
@@ -64,6 +70,7 @@ def frequencies():
             word_freqs[keys.index(w)][1] += 1
         else:
             word_freqs.append([w, 1])
+
 
 def sort():
     """
@@ -84,4 +91,4 @@ frequencies()
 sort()
 
 for tf in word_freqs[0:25]:
-    print(tf[0], '-', tf[1])
+    print(tf[0], "-", tf[1])

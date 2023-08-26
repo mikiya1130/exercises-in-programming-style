@@ -1,9 +1,16 @@
 #!/usr/bin/env python
-import sys, operator, string, os, threading, re
-from util import getch, cls, get_input
+import operator
+import os
+import re
+import string
+import sys
+import threading
 from time import sleep
 
+from util import cls, get_input, getch
+
 lock = threading.Lock()
+
 
 #
 # The active view
@@ -11,7 +18,7 @@ lock = threading.Lock()
 class FreqObserver(threading.Thread):
     def __init__(self, freqs):
         threading.Thread.__init__(self)
-        self.daemon,self._end = True, False
+        self.daemon, self._end = True, False
         # freqs is the part of the model to be observed
         self._freqs = freqs
         self._freqs_0 = sorted(self._freqs.items(), key=operator.itemgetter(1), reverse=True)[:25]
@@ -30,7 +37,7 @@ class FreqObserver(threading.Thread):
         lock.acquire()
         freqs_1 = sorted(self._freqs.items(), key=operator.itemgetter(1), reverse=True)[:25]
         lock.release()
-        if (freqs_1 != self._freqs_0):
+        if freqs_1 != self._freqs_0:
             self._update_display(freqs_1)
             self._freqs_0 = freqs_1
 
@@ -42,26 +49,31 @@ class FreqObserver(threading.Thread):
             sys.stdout.flush()
 
         data_str = ""
-        for (w, c) in tuples:
-            data_str += str(w) + ' - ' + str(c) + '\n'
+        for w, c in tuples:
+            data_str += str(w) + " - " + str(c) + "\n"
         refresh_screen(data_str)
+
 
 #
 # The model
 #
 class WordsCounter:
     freqs = {}
+
     def count(self):
         def non_stop_words():
-            stopwords = set(open('../stop_words.txt').read().split(',')  + list(string.ascii_lowercase))
+            stopwords = set(
+                open("../stop_words.txt").read().split(",") + list(string.ascii_lowercase)
+            )
             for line in f:
-                yield [w for w in re.findall('[a-z]{2,}', line.lower()) if w not in stopwords]
+                yield [w for w in re.findall("[a-z]{2,}", line.lower()) if w not in stopwords]
 
         words = next(non_stop_words())
         lock.acquire()
         for w in words:
-            self.freqs[w] = 1 if w not in self.freqs else self.freqs[w]+1
+            self.freqs[w] = 1 if w not in self.freqs else self.freqs[w] + 1
         lock.release()
+
 
 #
 # The controller
@@ -79,5 +91,3 @@ with open(sys.argv[1]) as f:
             view.stop()
             sleep(1)
             break
-
-

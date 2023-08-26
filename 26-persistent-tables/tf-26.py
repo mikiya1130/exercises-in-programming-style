@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-import sys, re, string, sqlite3, os.path
+import os.path
+import re
+import sqlite3
+import string
+import sys
+
 
 #
 # The relational database of this problem consists of 3 tables:
@@ -7,21 +12,23 @@ import sys, re, string, sqlite3, os.path
 #
 def create_db_schema(connection):
     c = connection.cursor()
-    c.execute('''CREATE TABLE documents (id INTEGER PRIMARY KEY AUTOINCREMENT, name)''')
-    c.execute('''CREATE TABLE words (id, doc_id, value)''')
-    c.execute('''CREATE TABLE characters (id, word_id, value)''')
+    c.execute("""CREATE TABLE documents (id INTEGER PRIMARY KEY AUTOINCREMENT, name)""")
+    c.execute("""CREATE TABLE words (id, doc_id, value)""")
+    c.execute("""CREATE TABLE characters (id, word_id, value)""")
     connection.commit()
     c.close()
 
+
 def load_file_into_database(path_to_file, connection):
-    """ Takes the path to a file and loads the contents into the database """
+    """Takes the path to a file and loads the contents into the database"""
+
     def _extract_words(path_to_file):
         with open(path_to_file) as f:
-            str_data = f.read()    
-        pattern = re.compile('[\W_]+')
-        word_list = pattern.sub(' ', str_data).lower().split()
-        with open('../stop_words.txt') as f:
-            stop_words = f.read().split(',')
+            str_data = f.read()
+        pattern = re.compile("[\W_]+")
+        word_list = pattern.sub(" ", str_data).lower().split()
+        with open("../stop_words.txt") as f:
+            stop_words = f.read().split(",")
         stop_words.extend(list(string.ascii_lowercase))
         return [w for w in word_list if not w in stop_words]
 
@@ -51,19 +58,20 @@ def load_file_into_database(path_to_file, connection):
     connection.commit()
     c.close()
 
+
 #
 # Create if it doesn't exist
 #
-if not os.path.isfile('tf.db'):
-    with sqlite3.connect('tf.db') as connection:
+if not os.path.isfile("tf.db"):
+    with sqlite3.connect("tf.db") as connection:
         create_db_schema(connection)
         load_file_into_database(sys.argv[1], connection)
 
 # Now, let's query
-with sqlite3.connect('tf.db') as connection:
+with sqlite3.connect("tf.db") as connection:
     c = connection.cursor()
     c.execute("SELECT value, COUNT(*) as C FROM words GROUP BY value ORDER BY C DESC")
     for i in range(25):
         row = c.fetchone()
         if row != None:
-            print(row[0], '-', str(row[1]))
+            print(row[0], "-", str(row[1]))
