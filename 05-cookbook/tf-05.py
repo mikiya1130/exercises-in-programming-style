@@ -2,29 +2,18 @@
 import string
 import sys
 
-# The shared mutable data
 data = []
 words = []
 word_freqs = []
 
 
-#
-# The procedures
-#
 def read_file(path_to_file):
-    """
-    Takes a path to a file and assigns the entire
-    contents of the file to the global variable data
-    """
     global data
-    with open(path_to_file) as f:
+    with open(path_to_file, encoding="utf-8") as f:
         data = data + list(f.read())
 
 
 def filter_chars_and_normalize():
-    """
-    Replaces all nonalphanumeric chars in data with white space
-    """
     global data
     for i in range(len(data)):
         if not data[i].isalnum():
@@ -34,9 +23,6 @@ def filter_chars_and_normalize():
 
 
 def scan():
-    """
-    Scans data for words, filling the global variable words
-    """
     global data
     global words
     data_str = "".join(data)
@@ -47,7 +33,6 @@ def remove_stop_words():
     global words
     with open("../stop_words.txt") as f:
         stop_words = f.read().split(",")
-    # add single-letter words
     stop_words.extend(list(string.ascii_lowercase))
     indexes = []
     for i in range(len(words)):
@@ -58,10 +43,6 @@ def remove_stop_words():
 
 
 def frequencies():
-    """
-    Creates a list of pairs associating
-    words with frequencies
-    """
     global words
     global word_freqs
     for w in words:
@@ -73,16 +54,10 @@ def frequencies():
 
 
 def sort():
-    """
-    Sorts word_freqs by frequency
-    """
     global word_freqs
     word_freqs.sort(key=lambda x: x[1], reverse=True)
 
 
-#
-# The main function
-#
 read_file(sys.argv[1])
 filter_chars_and_normalize()
 scan()
