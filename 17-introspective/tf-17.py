@@ -7,9 +7,6 @@ import sys
 
 
 def read_stop_words():
-    """This function can only be called from a function
-    named extract_words."""
-    # Meta-level data: inspect.stack()
     if inspect.stack()[1][3] != "extract_words":
         return None
 
@@ -20,17 +17,15 @@ def read_stop_words():
 
 
 def extract_words(path_to_file):
-    # Meta-level data: locals()
-    with open(locals()["path_to_file"]) as f:
+    with open(locals()["path_to_file"], encoding="utf-8") as f:
         str_data = f.read()
-    pattern = re.compile("[\W_]+")
+    pattern = re.compile(r"[\W_]+")
     word_list = pattern.sub(" ", str_data).lower().split()
     stop_words = read_stop_words()
-    return [w for w in word_list if not w in stop_words]
+    return [w for w in word_list if w not in stop_words]
 
 
 def frequencies(word_list):
-    # Meta-level data: locals()
     word_freqs = {}
     for w in locals()["word_list"]:
         if w in word_freqs:
@@ -41,7 +36,6 @@ def frequencies(word_list):
 
 
 def sort(word_freq):
-    # Meta-level data: locals()
     return sorted(locals()["word_freq"].items(), key=operator.itemgetter(1), reverse=True)
 
 
