@@ -5,12 +5,10 @@ import string
 import sys
 
 
-# Auxiliary functions that can't be lambdas
-#
 def extract_words(obj, path_to_file):
-    with open(path_to_file) as f:
+    with open(path_to_file, encoding="utf-8") as f:
         obj["data"] = f.read()
-    pattern = re.compile("[\W_]+")
+    pattern = re.compile(r"[\W_]+")
     data_str = "".join(pattern.sub(" ", obj["data"]).lower())
     obj["data"] = data_str.split()
 
@@ -18,7 +16,6 @@ def extract_words(obj, path_to_file):
 def load_stop_words(obj):
     with open("../stop_words.txt") as f:
         obj["stop_words"] = f.read().split(",")
-    # add single-letter words
     obj["stop_words"].extend(list(string.ascii_lowercase))
 
 
