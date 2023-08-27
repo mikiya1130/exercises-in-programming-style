@@ -5,9 +5,6 @@ import string
 import sys
 
 
-#
-# The One class for this example
-#
 class TFTheOne:
     def __init__(self, v):
         self._value = v
@@ -20,17 +17,14 @@ class TFTheOne:
         print(self._value)
 
 
-#
-# The functions
-#
 def read_file(path_to_file):
-    with open(path_to_file) as f:
+    with open(path_to_file, encoding="utf-8") as f:
         data = f.read()
     return data
 
 
 def filter_chars(str_data):
-    pattern = re.compile("[\W_]+")
+    pattern = re.compile(r"[\W_]+")
     return pattern.sub(" ", str_data)
 
 
@@ -44,10 +38,9 @@ def scan(str_data):
 
 def remove_stop_words(word_list):
     with open("../stop_words.txt") as f:
-        stop_words = f.read().strip("\n").split(",")
-    # add single-letter words
+        stop_words = f.read().split(",")
     stop_words.extend(list(string.ascii_lowercase))
-    return [w for w in word_list if not w in stop_words]
+    return [w for w in word_list if w not in stop_words]
 
 
 def frequencies(word_list):
@@ -71,9 +64,6 @@ def top25_freqs(word_freqs):
     return top25
 
 
-#
-# The main function
-#
 TFTheOne(sys.argv[1]).bind(read_file).bind(filter_chars).bind(normalize).bind(scan).bind(
     remove_stop_words
 ).bind(frequencies).bind(sort).bind(top25_freqs).printme()
