@@ -5,17 +5,14 @@ import string
 import sys
 
 
-#
-# The functions
-#
 def read_file(path_to_file, func):
-    with open(path_to_file) as f:
+    with open(path_to_file, encoding="utf-8") as f:
         data = f.read()
     func(data, normalize)
 
 
 def filter_chars(str_data, func):
-    pattern = re.compile("[\W_]+")
+    pattern = re.compile(r"[\W_]+")
     func(pattern.sub(" ", str_data), scan)
 
 
@@ -29,10 +26,9 @@ def scan(str_data, func):
 
 def remove_stop_words(word_list, func):
     with open("../stop_words.txt") as f:
-        stop_words = f.read().strip("\n").split(",")
-    # add single-letter words
+        stop_words = f.read().split(",")
     stop_words.extend(list(string.ascii_lowercase))
-    func([w for w in word_list if not w in stop_words], sort)
+    func([w for w in word_list if w not in stop_words], sort)
 
 
 def frequencies(word_list, func):
@@ -59,7 +55,4 @@ def no_op(func):
     return
 
 
-#
-# The main function
-#
 read_file(sys.argv[1], filter_chars)
