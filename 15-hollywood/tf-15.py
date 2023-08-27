@@ -5,9 +5,6 @@ import string
 import sys
 
 
-#
-# The "I'll call you back" Word Frequency Framework
-#
 class WordFrequencyFramework:
     _load_event_handlers = []
     _dowork_event_handlers = []
@@ -31,12 +28,7 @@ class WordFrequencyFramework:
             h()
 
 
-#
-# The entities of the application
-#
 class DataStorage:
-    """Models the contents of the file"""
-
     _data = ""
     _stop_word_filter = None
     _word_event_handlers = []
@@ -47,14 +39,12 @@ class DataStorage:
         wfapp.register_for_dowork_event(self.__produce_words)
 
     def __load(self, path_to_file):
-        with open(path_to_file) as f:
+        with open(path_to_file, encoding="utf-8") as f:
             self._data = f.read()
-        pattern = re.compile("[\W_]+")
+        pattern = re.compile(r"[\W_]+")
         self._data = pattern.sub(" ", self._data).lower()
 
     def __produce_words(self):
-        """Iterates through the list words in storage
-        calling back handlers for words"""
         data_str = "".join(self._data)
         for w in data_str.split():
             if not self._stop_word_filter.is_stop_word(w):
@@ -66,8 +56,6 @@ class DataStorage:
 
 
 class StopWordFilter:
-    """Models the stop word filter"""
-
     _stop_words = []
 
     def __init__(self, wfapp):
@@ -76,7 +64,6 @@ class StopWordFilter:
     def __load(self, ignore):
         with open("../stop_words.txt") as f:
             self._stop_words = f.read().split(",")
-        # add single-letter words
         self._stop_words.extend(list(string.ascii_lowercase))
 
     def is_stop_word(self, word):
@@ -84,8 +71,6 @@ class StopWordFilter:
 
 
 class WordFrequencyCounter:
-    """Keeps the word frequency data"""
-
     _word_freqs = {}
 
     def __init__(self, wfapp, data_storage):
@@ -104,9 +89,6 @@ class WordFrequencyCounter:
             print(w, "-", c)
 
 
-#
-# The main function
-#
 wfapp = WordFrequencyFramework()
 stop_word_filter = StopWordFilter(wfapp)
 data_storage = DataStorage(wfapp, stop_word_filter)
