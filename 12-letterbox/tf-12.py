@@ -6,8 +6,6 @@ import sys
 
 
 class DataStorageManager:
-    """Models the contents of the file"""
-
     _data = ""
 
     def dispatch(self, message):
@@ -19,20 +17,17 @@ class DataStorageManager:
             raise Exception("Message not understood " + message[0])
 
     def _init(self, path_to_file):
-        with open(path_to_file) as f:
+        with open(path_to_file, encoding="utf-8") as f:
             self._data = f.read()
-        pattern = re.compile("[\W_]+")
+        pattern = re.compile(r"[\W_]+")
         self._data = pattern.sub(" ", self._data).lower()
 
     def _words(self):
-        """Returns the list words in storage"""
         data_str = "".join(self._data)
         return data_str.split()
 
 
 class StopWordManager:
-    """Models the stop word filter"""
-
     _stop_words = []
 
     def dispatch(self, message):
@@ -53,8 +48,6 @@ class StopWordManager:
 
 
 class WordFrequencyManager:
-    """Keeps the word frequency data"""
-
     _word_freqs = {}
 
     def dispatch(self, message):
@@ -101,9 +94,6 @@ class WordFrequencyController:
             print(w, "-", c)
 
 
-#
-# The main function
-#
 wfcontroller = WordFrequencyController()
 wfcontroller.dispatch(["init", sys.argv[1]])
 wfcontroller.dispatch(["run"])
