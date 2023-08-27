@@ -5,9 +5,6 @@ import re
 import string
 import sys
 
-#
-# Two down-to-earth things
-#
 stops = set(open("../stop_words.txt").read().split(",") + list(string.ascii_lowercase))
 
 
@@ -21,12 +18,9 @@ def frequencies_imp(word_list):
     return word_freqs
 
 
-#
-# Let's write our functions as strings.
-#
 if len(sys.argv) > 1:
-    extract_words_func = "lambda name : [x.lower() for x in re.split('[^a-zA-Z]+', open(name).read()) if len(x) > 0 and x.lower() not in stops]"
-    frequencies_func = "lambda wl : frequencies_imp(wl)"
+    extract_words_func = "lambda name: [x.lower() for x in re.split(r'[^a-zA-Z]+', open(name, encoding='utf-8').read()) if len(x) > 0 and x.lower() not in stops]"
+    frequencies_func = "lambda wl: frequencies_imp(wl)"
     sort_func = (
         "lambda word_freq: sorted(word_freq.items(), key=operator.itemgetter(1), reverse=True)"
     )
@@ -36,19 +30,10 @@ else:
     frequencies_func = "lambda x: []"
     sort_func = "lambda x: []"
     filename = os.path.basename(__file__)
-#
-# So far, this program isn't much about term-frequency. It's about
-# a bunch of strings that look like functions.
-# Let's add our functions to the "base" program, dynamically.
-#
 exec("extract_words = " + extract_words_func)
 exec("frequencies = " + frequencies_func)
 exec("sort = " + sort_func)
 
-#
-# The main function. This would work just fine:
-#  word_freqs = sort(frequencies(extract_words(filename)))
-#
 word_freqs = locals()["sort"](locals()["frequencies"](locals()["extract_words"](filename)))
 
 for w, c in word_freqs[0:25]:
