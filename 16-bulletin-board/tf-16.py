@@ -5,9 +5,6 @@ import string
 import sys
 
 
-#
-# The event management substrate
-#
 class EventManager:
     def __init__(self):
         self._subscriptions = {}
@@ -25,12 +22,7 @@ class EventManager:
                 h(event)
 
 
-#
-# The application entities
-#
 class DataStorage:
-    """Models the contents of the file"""
-
     def __init__(self, event_manager):
         self._event_manager = event_manager
         self._event_manager.subscribe("load", self.load)
@@ -38,9 +30,9 @@ class DataStorage:
 
     def load(self, event):
         path_to_file = event[1]
-        with open(path_to_file) as f:
+        with open(path_to_file, encoding="utf-8") as f:
             self._data = f.read()
-        pattern = re.compile("[\W_]+")
+        pattern = re.compile(r"[\W_]+")
         self._data = pattern.sub(" ", self._data).lower()
 
     def produce_words(self, event):
@@ -51,8 +43,6 @@ class DataStorage:
 
 
 class StopWordFilter:
-    """Models the stop word filter"""
-
     def __init__(self, event_manager):
         self._stop_words = []
         self._event_manager = event_manager
@@ -71,8 +61,6 @@ class StopWordFilter:
 
 
 class WordFrequencyCounter:
-    """Keeps the word frequency data"""
-
     def __init__(self, event_manager):
         self._word_freqs = {}
         self._event_manager = event_manager
@@ -107,9 +95,6 @@ class WordFrequencyApplication:
         self._event_manager.publish(("print", None))
 
 
-#
-# The main function
-#
 em = EventManager()
 DataStorage(em), StopWordFilter(em), WordFrequencyCounter(em)
 WordFrequencyApplication(em)
