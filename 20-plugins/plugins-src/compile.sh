@@ -1,2 +1,2 @@
 python -m compileall .
-cp *.pyc ../plugins
+cp __pycache__/*.pyc ../plugins

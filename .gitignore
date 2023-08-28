@@ -9,3 +9,4 @@
 *.class
 
 01-good-old-times/word_freqs
+!20-plugins/plugins/*
