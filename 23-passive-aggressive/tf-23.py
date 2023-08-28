@@ -5,16 +5,13 @@ import string
 import sys
 
 
-#
-# The functions
-#
 def extract_words(path_to_file):
     assert type(path_to_file) is str, "I need a string! I quit!"
     assert path_to_file, "I need a non-empty string! I quit!"
 
-    with open(path_to_file) as f:
+    with open(path_to_file, encoding="utf-8") as f:
         data = f.read()
-    pattern = re.compile("[\W_]+")
+    pattern = re.compile(r"[\W_]+")
     word_list = pattern.sub(" ", data).lower().split()
     return word_list
 
@@ -24,9 +21,8 @@ def remove_stop_words(word_list):
 
     with open("../stop_words.txt") as f:
         stop_words = f.read().split(",")
-    # add single-letter words
     stop_words.extend(list(string.ascii_lowercase))
-    return [w for w in word_list if not w in stop_words]
+    return [w for w in word_list if w not in stop_words]
 
 
 def frequencies(word_list):
@@ -49,9 +45,6 @@ def sort(word_freqs):
     return sorted(word_freqs.items(), key=operator.itemgetter(1), reverse=True)
 
 
-#
-# The main function
-#
 try:
     assert len(sys.argv) > 1, "You idiot! I need an input file! I quit!"
     word_freqs = sort(frequencies(remove_stop_words(extract_words(sys.argv[1]))))
@@ -60,4 +53,4 @@ try:
     for tf in word_freqs[0:25]:
         print(tf[0], "-", tf[1])
 except Exception as e:
-    print("Something wrong: {0}".format(e))
+    print(f"Something wrong: {e}")
