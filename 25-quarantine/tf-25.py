@@ -5,9 +5,6 @@ import string
 import sys
 
 
-#
-# The Quarantine class for this example
-#
 class TFQuarantine:
     def __init__(self, func):
         self._funcs = [func]
@@ -18,7 +15,7 @@ class TFQuarantine:
 
     def execute(self):
         def guard_callable(v):
-            return v() if hasattr(v, "__call__") else v
+            return v() if callable(v) else v
 
         value = lambda: None
         for func in self._funcs:
@@ -26,9 +23,6 @@ class TFQuarantine:
         print(guard_callable(value))
 
 
-#
-# The functions
-#
 def get_input(arg):
     def _f():
         return sys.argv[1]
@@ -38,9 +32,9 @@ def get_input(arg):
 
 def extract_words(path_to_file):
     def _f():
-        with open(path_to_file) as f:
+        with open(path_to_file, encoding="utf-8") as f:
             data = f.read()
-        pattern = re.compile("[\W_]+")
+        pattern = re.compile(r"[\W_]+")
         word_list = pattern.sub(" ", data).lower().split()
         return word_list
 
@@ -51,9 +45,8 @@ def remove_stop_words(word_list):
     def _f():
         with open("../stop_words.txt") as f:
             stop_words = f.read().split(",")
-        # add single-letter words
         stop_words.extend(list(string.ascii_lowercase))
-        return [w for w in word_list if not w in stop_words]
+        return [w for w in word_list if w not in stop_words]
 
     return _f
 
@@ -79,9 +72,6 @@ def top25_freqs(word_freqs):
     return top25
 
 
-#
-# The main function
-#
 TFQuarantine(get_input).bind(extract_words).bind(remove_stop_words).bind(frequencies).bind(
     sort
 ).bind(top25_freqs).execute()
