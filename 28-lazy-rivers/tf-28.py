@@ -5,7 +5,7 @@ import sys
 
 
 def characters(filename):
-    for line in open(filename):
+    for line in open(filename, encoding="utf-8"):
         for c in line:
             yield c
 
@@ -13,10 +13,9 @@ def characters(filename):
 def all_words(filename):
     start_char = True
     for c in characters(filename):
-        if start_char == True:
+        if start_char is True:
             word = ""
             if c.isalnum():
-                # We found the start of a word
                 word = c.lower()
                 start_char = False
             else:
@@ -25,17 +24,14 @@ def all_words(filename):
             if c.isalnum():
                 word += c.lower()
             else:
-                # We found end of word, emit it
                 start_char = True
                 yield word
 
 
 def non_stop_words(filename):
-    stopwords = set(
-        open("../stop_words.txt").read().strip("\n").split(",") + list(string.ascii_lowercase)
-    )
+    stopwords = set(open("../stop_words.txt").read().split(",") + list(string.ascii_lowercase))
     for w in all_words(filename):
-        if not w in stopwords:
+        if w not in stopwords:
             yield w
 
 
@@ -49,9 +45,6 @@ def count_and_sort(filename):
     yield sorted(freqs.items(), key=operator.itemgetter(1), reverse=True)
 
 
-#
-# The main function
-#
 for word_freqs in count_and_sort(sys.argv[1]):
     print("-----------------------------")
     for w, c in word_freqs[0:25]:
