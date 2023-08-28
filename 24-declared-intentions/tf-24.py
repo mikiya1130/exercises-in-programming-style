@@ -6,9 +6,6 @@ import string
 import sys
 
 
-#
-# Decorator for enforcing types of arguments in method calls
-#
 class AcceptTypes:
     def __init__(self, *args):
         self._args = args
@@ -17,27 +14,22 @@ class AcceptTypes:
         def wrapped_f(*args):
             for i in range(len(self._args)):
                 if type(args[i]) != self._args[i]:
-                    raise TypeError(
-                        "Expecting %s got %s" % (str(self._args[i]), str(type(args[i])))
-                    )
+                    raise TypeError(f"Expecting {self._args[i]} got {type(args[i])}")
             return f(*args)
 
         return wrapped_f
 
 
-#
-# The functions
-#
 @AcceptTypes(str)
 def extract_words(path_to_file):
-    with open(path_to_file) as f:
+    with open(path_to_file, encoding="utf-8") as f:
         str_data = f.read()
-    pattern = re.compile("[\W_]+")
+    pattern = re.compile(r"[\W_]+")
     word_list = pattern.sub(" ", str_data).lower().split()
     with open("../stop_words.txt") as f:
         stop_words = f.read().split(",")
     stop_words.extend(list(string.ascii_lowercase))
-    return [w for w in word_list if not w in stop_words]
+    return [w for w in word_list if w not in stop_words]
 
 
 @AcceptTypes(list)
