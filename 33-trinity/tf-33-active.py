@@ -12,14 +12,10 @@ from util import cls, get_input, getch
 lock = threading.Lock()
 
 
-#
-# The active view
-#
 class FreqObserver(threading.Thread):
     def __init__(self, freqs):
-        threading.Thread.__init__(self)
+        super().__init__()
         self.daemon, self._end = True, False
-        # freqs is the part of the model to be observed
         self._freqs = freqs
         self._freqs_0 = sorted(self._freqs.items(), key=operator.itemgetter(1), reverse=True)[:25]
         self.start()
@@ -43,7 +39,6 @@ class FreqObserver(threading.Thread):
 
     def _update_display(self, tuples):
         def refresh_screen(data):
-            # clear screen
             cls()
             print(data)
             sys.stdout.flush()
@@ -54,9 +49,6 @@ class FreqObserver(threading.Thread):
         refresh_screen(data_str)
 
 
-#
-# The model
-#
 class WordsCounter:
     freqs = {}
 
@@ -66,7 +58,7 @@ class WordsCounter:
                 open("../stop_words.txt").read().split(",") + list(string.ascii_lowercase)
             )
             for line in f:
-                yield [w for w in re.findall("[a-z]{2,}", line.lower()) if w not in stopwords]
+                yield [w for w in re.findall(r"[a-z]{2,}", line.lower()) if w not in stopwords]
 
         words = next(non_stop_words())
         lock.acquire()
@@ -75,19 +67,15 @@ class WordsCounter:
         lock.release()
 
 
-#
-# The controller
-#
 print("Press space bar to fetch words from the file one by one")
 print("Press ESC to switch to automatic mode")
 model = WordsCounter()
 view = FreqObserver(model.freqs)
-with open(sys.argv[1]) as f:
+with open(sys.argv[1], encoding="utf-8") as f:
     while get_input():
         try:
             model.count()
         except StopIteration:
-            # Let's wait for the view thread to die gracefully
             view.stop()
             sleep(1)
             break

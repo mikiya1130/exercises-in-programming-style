@@ -6,9 +6,6 @@ import sys
 
 
 class WordFrequenciesModel:
-    """Models the data. In this case, we're only interested
-    in words and their frequencies as an end result"""
-
     freqs = {}
     stopwords = set(open("../stop_words.txt").read().split(","))
 
@@ -17,7 +14,7 @@ class WordFrequenciesModel:
 
     def update(self, path_to_file):
         try:
-            words = re.findall("[a-z]{2,}", open(path_to_file).read().lower())
+            words = re.findall(r"[a-z]{2,}", open(path_to_file, encoding="utf-8").read().lower())
             self.freqs = collections.Counter(w for w in words if w not in self.stopwords)
         except IOError:
             print("File not found")
