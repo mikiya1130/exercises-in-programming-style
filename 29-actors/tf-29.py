@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import operator
 import re
 import string
@@ -10,18 +9,18 @@ from threading import Thread
 
 class ActiveWFObject(Thread):
     def __init__(self):
-        Thread.__init__(self)
+        super().__init__()
         self.name = str(type(self))
         self.queue = Queue()
-        self._stopMe = False
+        self._stop_me = False
         self.start()
 
     def run(self):
-        while not self._stopMe:
+        while not self._stop_me:
             message = self.queue.get()
             self._dispatch(message)
             if message[0] == "die":
-                self._stopMe = True
+                self._stop_me = True
 
 
 def send(receiver, message):
@@ -29,8 +28,6 @@ def send(receiver, message):
 
 
 class DataStorageManager(ActiveWFObject):
-    """Models the contents of the file"""
-
     _data = ""
 
     def _dispatch(self, message):
@@ -39,15 +36,14 @@ class DataStorageManager(ActiveWFObject):
         elif message[0] == "send_word_freqs":
             self._process_words(message[1:])
         else:
-            # forward
             send(self._stop_word_manager, message)
 
     def _init(self, message):
         path_to_file = message[0]
         self._stop_word_manager = message[1]
-        with open(path_to_file) as f:
+        with open(path_to_file, encoding="utf-8") as f:
             self._data = f.read()
-        pattern = re.compile("[\W_]+")
+        pattern = re.compile(r"[\W_]+")
         self._data = pattern.sub(" ", self._data).lower()
 
     def _process_words(self, message):
@@ -60,8 +56,6 @@ class DataStorageManager(ActiveWFObject):
 
 
 class StopWordManager(ActiveWFObject):
-    """Models the stop word filter"""
-
     _stop_words = []
 
     def _dispatch(self, message):
@@ -70,7 +64,6 @@ class StopWordManager(ActiveWFObject):
         elif message[0] == "filter":
             return self._filter(message[1:])
         else:
-            # forward
             send(self._word_freqs_manager, message)
 
     def _init(self, message):
@@ -86,8 +79,6 @@ class StopWordManager(ActiveWFObject):
 
 
 class WordFrequencyManager(ActiveWFObject):
-    """Keeps the word frequency data"""
-
     _word_freqs = {}
 
     def _dispatch(self, message):
@@ -127,12 +118,9 @@ class WordFrequencyController(ActiveWFObject):
         for w, f in word_freqs[0:25]:
             print(w, "-", f)
         send(self._storage_manager, ["die"])
-        self._stopMe = True
+        self._stop_me = True
 
 
-#
-# The main function
-#
 word_freq_manager = WordFrequencyManager()
 
 stop_word_manager = StopWordManager()
@@ -144,5 +132,4 @@ send(storage_manager, ["init", sys.argv[1], stop_word_manager])
 wfcontroller = WordFrequencyController()
 send(wfcontroller, ["run", storage_manager])
 
-# Wait for the active objects to finish
 [t.join() for t in [word_freq_manager, stop_word_manager, storage_manager, wfcontroller]]
