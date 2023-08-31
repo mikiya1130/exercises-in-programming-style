@@ -5,15 +5,12 @@ import re
 import sys
 import threading
 
-# Two data spaces
 word_space = queue.Queue()
 freq_space = queue.Queue()
 
 stopwords = set(open("../stop_words.txt").read().split(","))
 
 
-# Worker function that consumes words from the word space
-# and sends partial results to the frequency space
 def process_words():
     word_freqs = {}
     while True:
@@ -29,21 +26,16 @@ def process_words():
     freq_space.put(word_freqs)
 
 
-# Let's have this thread populate the word space
-for word in re.findall("[a-z]{2,}", open(sys.argv[1]).read().lower()):
+for word in re.findall(r"[a-z]{2,}", open(sys.argv[1], encoding="utf-8").read().lower()):
     word_space.put(word)
 
-# Let's create the workers and launch them at their jobs
 workers = []
 for i in range(5):
     workers.append(threading.Thread(target=process_words))
 [t.start() for t in workers]
 
-# Let's wait for the workers to finish
 [t.join() for t in workers]
 
-# Let's merge the partial frequency results by consuming
-# frequency data from the frequency space
 word_freqs = {}
 while not freq_space.empty():
     freqs = freq_space.get()
