@@ -35,7 +35,6 @@ def decode_one_hot(x):
 
 
 def build_model():
-    # Normalize characters using a dense layer
     model = Sequential()
     dense_layer = Dense(INPUT_VOCAB_SIZE, input_shape=(INPUT_VOCAB_SIZE,), activation="softmax")
     model.add(dense_layer)
@@ -79,7 +78,7 @@ model.summary()
 train(model)
 
 input("Network has been trained. Press <Enter> to run program.")
-with open(sys.argv[1]) as f:
+with open(sys.argv[1], encoding="utf-8") as f:
     for line in f:
         if line.isspace():
             continue
