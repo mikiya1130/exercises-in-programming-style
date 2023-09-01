@@ -24,7 +24,6 @@ def encode_one_hot(line):
 def decode_values(x):
     s = []
     for onehot in x:
-        # Find the index of the value closest to 1
         one_index = (np.abs(onehot - 1.0)).argmin()
         s.append(indices_char[one_index])
     return "".join(s)
@@ -34,16 +33,13 @@ def layer0_set_weights(n_layer):
     wb = []
     w = np.zeros((INPUT_VOCAB_SIZE, 1), dtype=np.float32)
     b = np.zeros((1), dtype=np.float32)
-    # Let lower case letters go through
     for c in string.ascii_lowercase:
         i = char_indices[c]
         w[i, 0] = 1.0 / i
-    # Map capitals to lower case
     for c in string.ascii_uppercase:
         i = char_indices[c]
         il = char_indices[c.lower()]
         w[i, 0] = 1.0 / il
-    # Map all non-letters to space
     sp_idx = char_indices[" "]
     for c in [c for c in list(string.printable) if c not in list(string.ascii_letters)]:
         i = char_indices[c]
@@ -59,11 +55,9 @@ def layer1_set_weights(n_layer):
     wb = []
     w = np.zeros((1, INPUT_VOCAB_SIZE), dtype=np.float32)
     b = np.zeros((INPUT_VOCAB_SIZE), dtype=np.float32)
-    # Recover the lower case letters
     for c in string.ascii_lowercase:
         i = char_indices[c]
         w[0, i] = i
-    # Recover the space
     sp_idx = char_indices[" "]
     w[0, sp_idx] = sp_idx
 
@@ -85,7 +79,7 @@ model.summary()
 layer0_set_weights(model.layers[0])
 layer1_set_weights(model.layers[1])
 
-with open(sys.argv[1]) as f:
+with open(sys.argv[1], encoding="utf-8") as f:
     for line in f:
         if line.isspace():
             continue
