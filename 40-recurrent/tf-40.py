@@ -34,7 +34,6 @@ def decode_one_hot(x):
 
 
 def prepare_for_rnn(x):
-    # All slices of size TIME_STEPS, sliding through x
     ind = [np.array(np.arange(i, i + TIME_STEPS)) for i in range(x.shape[0] - TIME_STEPS + 1)]
     ind = np.array(ind, dtype=np.int32)
     x_rnn = x[ind]
@@ -96,7 +95,7 @@ model.summary()
 train(model)
 
 input("Network has been trained. Press <Enter> to run program.")
-with open(sys.argv[1]) as f:
+with open(sys.argv[1], encoding="utf-8") as f:
     for line in f:
         if line.isspace():
             continue
